@@ -71,6 +71,62 @@ The system runs entirely offline, without any network dependencies, and complete
    - Each JSON contains persona, job_to_be_done, input_documents, processing_timestamp, extracted_sections and sub_section_analysis.
    - All outputs are generated offline, with no internet access.
 
+## Models and Libraries Used
+
+- **`sentence-transformers/all-MiniLM-L6-v2`**  
+  - A 90MB transformer model optimized for semantic similarity tasks.
+  - Embeds both queries and document content into dense vector space.
+  - Lightweight and fast enough to run under CPU constraints.
+  - Pre-downloaded and included in the Docker container to ensure offline compatibility.
+
+- **`PyMuPDF (fitz)`**  
+  - High-performance PDF parser used for layout-preserving extraction.
+  - Provides precise block-level segmentation with page positioning.
+
+- **`torch`**  
+  - Backend library required by `sentence-transformers` for tensor operations and model inference.
+
+- **`transformers`**  
+  - HuggingFace’s interface used to load and configure the transformer model architecture.
+
+- **`numpy`**  
+  - Used for vector computations including cosine similarity scoring.
+
+All libraries are installed via `requirements.txt` and handled inside the Docker container.
+
+## Compliance with Hackathon Constraints
+
+This solution adheres to all constraints outlined in the Adobe Hackathon Round 1B guidelines:
+
+| Constraint           | Our Compliance                                          |
+|----------------------|----------------------------------------------------------|
+| Execution Time       | Completes under 10 seconds for a 50-page PDF            |
+| Model Size           | Uses a 90MB model (`all-MiniLM-L6-v2`)                  |
+| Network Access       | No internet access required; runs fully offline         |
+| Runtime              | Runs on CPU-only (amd64) environment                    |
+| System Requirements  | Tested on 8 CPU / 16 GB RAM environment                 |
+
+## How to Build and Run
+Please follow the exact commands below to evaluate our solution. These align with the instructions provided in the hackathon guidelines. 
+### Input Instructions
+- Place all the input **PDF files** in the `input/` folder in the root directory.
+- Also place the input JSON file `challenge1b_input.json` inside the same `input/` folder.
+- Make sure the filenames listed in the JSON exist in the `input/` directory.
+  
+### Build the Docker image
+Docker must be installed and running on your system.
+Run the following command from the root directory of the project (where the Dockerfile is located):
+```bash
+docker build --platform linux/amd64 -t codetrinetra:round1b .
+```
+### Run the Docker container
+After building the image, run the following command to process the input documents:
+```bash
+docker run --rm -v $(pwd)/input:/app/input -v $(pwd)/output:/app/output --network none codetrinetra:round1b
+```
+
+### Expected Execution
+- A JSON file named `challenge1b_output.json` will be generated in the `output` folder in the root directory.
 ### Output JSON Structure
 ```json
 {
@@ -111,57 +167,6 @@ The system runs entirely offline, without any network dependencies, and complete
     }
   ]
 }
-```
-
-
-## Models and Libraries Used
-
-- **`sentence-transformers/all-MiniLM-L6-v2`**  
-  - A 90MB transformer model optimized for semantic similarity tasks.
-  - Embeds both queries and document content into dense vector space.
-  - Lightweight and fast enough to run under CPU constraints.
-  - Pre-downloaded and included in the Docker container to ensure offline compatibility.
-
-- **`PyMuPDF (fitz)`**  
-  - High-performance PDF parser used for layout-preserving extraction.
-  - Provides precise block-level segmentation with page positioning.
-
-- **`torch`**  
-  - Backend library required by `sentence-transformers` for tensor operations and model inference.
-
-- **`transformers`**  
-  - HuggingFace’s interface used to load and configure the transformer model architecture.
-
-- **`numpy`**  
-  - Used for vector computations including cosine similarity scoring.
-
-All libraries are installed via `requirements.txt` and handled inside the Docker container.
-
-## Compliance with Hackathon Constraints
-
-This solution adheres to all constraints outlined in the Adobe Hackathon Round 1B guidelines:
-
-| Constraint           | Our Compliance                                          |
-|----------------------|----------------------------------------------------------|
-| Execution Time       | Completes under 10 seconds for a 50-page PDF            |
-| Model Size           | Uses a 90MB model (`all-MiniLM-L6-v2`)                  |
-| Network Access       | No internet access required; runs fully offline         |
-| Runtime              | Runs on CPU-only (amd64) environment                    |
-| System Requirements  | Tested on 8 CPU / 16 GB RAM environment                 |
-
-## How to Build and Run
-
-To evaluate our solution, please use the exact instructions below as per the hackathon guidelines.
-
-### Build the Docker image
-```bash
-docker build --platform linux/amd64 -t codetrinetra:round1b .
-```
-
-### Run the Docker container
-
-```bash
-docker run --rm -v $(pwd)/input:/app/input -v $(pwd)/output:/app/output --network none codetrinetra:round1b
 ```
 
 ## Team Members
