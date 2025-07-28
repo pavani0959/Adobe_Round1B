@@ -68,12 +68,50 @@ The system runs entirely offline, without any network dependencies, and complete
 5. **Filtering & Output Generation**  
    - The top-scoring blocks are compiled into a structured output format.
    - Output is written to `challenge1b_output.json`.
-   - Each JSON contains:
-     - The role and task fields
-     - List of relevant blocks (with page number and text)
-     - Similarity scores
-     - Source PDF name
-   - All outputs are generated without any internet access.
+   - Each JSON contains persona, job_to_be_done, input_documents, processing_timestamp, extracted_sections and sub_section_analysis.
+   - All outputs are generated offline, with no internet access.
+
+### Output JSON Structure
+```json
+{
+  "metadata": {
+    "input_documents": [
+      "Breakfast Ideas.pdf",
+      "Dinner Ideas - Mains_1.pdf",
+      "Dinner Ideas - Sides_1.pdf"
+    ],
+    "persona": "food contractor",
+    "job_to_be_done": "Prepare a vegetarian buffet-style dinner menu for a corporate gathering, including gluten-free items.",
+    "processing_timestamp": "2025-07-27T11:54:33.175696"
+  },
+  "extracted_sections": [
+    {
+      "document": "Breakfast Ideas.pdf",
+      "section_title": "Veggie Wrap Ingredients:",
+      "importance_rank": 1,
+      "page_number": 13
+    },
+    {
+      "document": "Dinner Ideas - Sides_1.pdf",
+      "section_title": "Ingredients:",
+      "importance_rank": 2,
+      "page_number": 2
+    }
+  ],
+  "subsection_analysis": [
+    {
+      "document": "Dinner Ideas - Sides_1.pdf",
+      "refined_text": "o Arrange meats, cheeses, olives, and vegetables on a platter. o Serve with breadsticks.",
+      "page_number": 3
+    },
+    {
+      "document": "Dinner Ideas - Sides_4.pdf",
+      "refined_text": "o Serve as a dip or side dish. Som Tum (Green Papaya Salad)",
+      "page_number": 15
+    }
+  ]
+}
+```
 
 
 ## Models and Libraries Used
@@ -98,6 +136,19 @@ The system runs entirely offline, without any network dependencies, and complete
   - Used for vector computations including cosine similarity scoring.
 
 All libraries are installed via `requirements.txt` and handled inside the Docker container.
+
+## Compliance with Hackathon Constraints
+
+This solution adheres to all constraints outlined in the Adobe Hackathon Round 1B guidelines:
+
+| Constraint           | Our Compliance                                          |
+|----------------------|----------------------------------------------------------|
+| Execution Time       | Completes under 10 seconds for a 50-page PDF            |
+| Model Size           | Uses a 90MB model (`all-MiniLM-L6-v2`)                  |
+| Network Access       | No internet access required; runs fully offline         |
+| Runtime              | Runs on CPU-only (amd64) environment                    |
+| System Requirements  | Tested on 8 CPU / 16 GB RAM environment                 |
+
 ## How to Build and Run
 
 To evaluate our solution, please use the exact instructions below as per the hackathon guidelines.
